@@ -1,0 +1,59 @@
+<% if !@user.avatar.file.nil? %>
+	<img style="height: 100px;" src= <%= @user.avatar.url %> >
+<% end %>
+<h1><%= @user.name %></h1>
+<%= link_to "Edit", edit_user_path(@user) %><br>
+<% if params[:filter] == nil %>
+	<%= link_to "Not Complete", user_path(@user, filter: false) %><br>
+	<%= link_to "Completed", user_path(@user, filter: true) %><br>
+<% elsif params[:filter] == "false" %>
+	<%= link_to "All", user_path(@user) %><br>
+	<%= link_to "Completed", user_path(@user, filter: true) %><br>
+<% elsif params[:filter] == "true" %>
+	<%= link_to "All", user_path(@user) %><br>
+	<%= link_to "Not Complete", user_path(@user, filter: false) %><br>
+<% end %>
+<% if @todos.count != 0 %>
+	<table>
+		<tr>
+			<th>No.</th>
+			<th>Images</th>
+			<th>Description</th>
+			<th>Completion</th>
+			<th>Actions</th>
+		</tr>
+		<% @todos.each_with_index do |todo,index| %>
+			<tr>
+				<td><%= index + 1 %>.</td>
+				<td>
+				<% if todo.avatars.count != 0 %>
+					<% todo.avatars.each_with_index do |avatar,index2| %>
+						<a href= <%= avatar.url %> ><img style="width: 100px;" src= <%= avatar.url %> ></a>
+						<% if index2.odd? %>
+							<br>
+						<% end %>
+					<% end %>
+				<% else %>
+					No images
+				<% end %>
+				</td>
+				<td><%= todo.description %></td>
+				<td><%= link_to "#{todo.status}", toggle_path(id: todo.id), style: "text-decoration: none; color: blue;", class: "toggle", remote: true, id: "#{todo.id}", method: :post %></td>
+				<td><%= link_to "Edit", edit_todo_path(todo) %> <%= link_to "Delete", todo_path(todo), method: :delete, data: { confirm: "Are you sure?" } %></td>
+			</tr>
+		<% end %>
+	</table>
+<% elsif params[:filter] %>
+<% else %>
+	You have no Todos for now.
+<% end %>
+<% if @user.position == "admin" || @user.paid == true || @user.todos.count < 5 %>
+	<br><%= link_to "New todo", new_todo_path %>
+<% else %>
+	<br><%= link_to "Pay 0.99 USD to create unlimited todos.", braintree_new_path(id: @user.id) %>
+<% end %>
+<% if @user.position == "admin" %>
+	<br><%= link_to "Admin Page", admin_path(id: @user.id), data: { no_turbolink: true } %>
+<% end %>
+<br><%= link_to "Log Out", logout_path, method: :post %><br>
+<%= request.location.city %>

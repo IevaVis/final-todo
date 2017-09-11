@@ -1,0 +1,14 @@
+<% if @users.count != 0 %>
+	<ol type="I" >
+		<% @users.each do |user| %>
+			<li><%= link_to "#{user.name}", inspect_user_path(admin_id: @admin.id, user_id: user.id) %> : 
+			<% if user.position == "user" %>
+				User
+			<% else %>
+				Admin
+			<% end %>
+			</li>
+		<% end %>
+	</ol>
+<% end %>
+<%= link_to "Back", admin_path(id: @admin.id) %>

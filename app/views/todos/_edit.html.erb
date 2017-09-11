@@ -1,0 +1,5 @@
+<%= form_for @todo do |t| %>
+	<%= t.file_field :avatars, multiple: true %>
+	<%= t.text_field :description %>
+	<%= t.submit "Edit" %>
+<% end %>

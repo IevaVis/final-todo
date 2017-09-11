@@ -1,0 +1,85 @@
+<div class="demo-frame">  
+
+  <%= form_for :checkout_form, url: braintree_checkout_path, html: { id: "cardForm"} do |form| %>
+
+    <%= form.label :card_number, "Credit Card Number", html: {class: "hosted-fields--label"} %>
+    <div id="card-number" class="hosted-field"></div>
+
+    <%= form.label :expiration_date, "Expiration Date", html: {class: "hosted-fields--label"} %>      
+    <div id="expiration-date" class="hosted-field"></div>
+
+    <%= form.label :cvv, "CVV", html: {class: "hosted-fields--label"} %>
+    <div id="cvv" class="hosted-field"></div>
+
+    <%= form.hidden_field "payment_method_nonce",id: "nonce" %>
+    <input type="hidden" name="id" value=<%= @user.id %>>
+
+    <div class="button-container">
+      <%= form.submit "Purchase", disabled: true, class: "button" %>
+    </div>
+  <% end %>
+</div>
+<br><%= link_to "Back", user_path(@user) %>
+<script type="text/javascript">
+var form = document.querySelector('#cardForm');
+var submit = document.querySelector('input[type="submit"]')
+var authorization = '<%= @client_token %>';
+
+braintree.client.create({
+        authorization: authorization
+      }, function (clientErr, clientInstance) {
+        if (clientErr) {
+          console.error(clientErr);
+          return;
+        }
+
+        braintree.hostedFields.create({
+          client: clientInstance,
+          styles: {
+            'input': {
+              'font-size': '14px'
+            },
+            'input.invalid': {
+              'color': 'red'
+            },
+            'input.valid': {
+              'color': 'green'
+            }
+          },
+          fields: {
+            number: {
+              selector: '#card-number',
+              placeholder: '4111 1111 1111 1111'
+            },
+            cvv: {
+              selector: '#cvv',
+              placeholder: '123'
+            },
+            expirationDate: {
+              selector: '#expiration-date',
+              placeholder: '10/2019'
+            }
+          }
+        }, function (hostedFieldsErr, hostedFieldsInstance) {
+          if (hostedFieldsErr) {
+            console.error(hostedFieldsErr);
+            return;
+          }
+
+          submit.removeAttribute('disabled');
+
+          form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
+              if (tokenizeErr) {
+                console.error(tokenizeErr);
+                return;
+              }
+              document.querySelector("#nonce").value = payload.nonce
+              form.submit()
+            });
+          }, false);
+        });
+      });
+</script>

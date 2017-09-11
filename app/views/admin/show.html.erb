@@ -1,0 +1,4 @@
+<h1>Admin Page</h1>
+<h1><%= @admin.name %></h1>
+<%= link_to "Show Users", show_users_path(id: @admin.id) %><br>
+<%= link_to "Back", user_path(@admin) %>

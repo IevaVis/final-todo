@@ -1,0 +1,6 @@
+<%= form_for @user do |u| %>
+	<%= u.file_field :avatar %>
+	<%= u.text_field :first_name %>
+	<%= u.text_field :last_name %>
+	<%= u.submit "Edit" %>
+<% end %>
